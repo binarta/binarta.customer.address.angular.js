@@ -30,7 +30,7 @@ function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHan
     $scope.submit = function () {
         var onSuccess = function () {
             topicMessageDispatcher.fire('system.success', {code: 'customer.address.add.success', default: 'Address was successfully added'})
-            $location.path($scope.locale + '/profile');
+            $location.path(($scope.locale ? $scope.locale : '') + '/profile');
         };
         var presenter = usecaseAdapterFactory($scope, onSuccess);
         var baseUri = config.baseUri || '';
@@ -79,7 +79,7 @@ function EditCustomerAddressController($scope, usecaseAdapterFactory, $routePara
     $scope.submit = function () {
         var onSuccess = function () {
             topicMessageDispatcher.fire('system.success', {code: 'customer.address.edit.success', default: 'Address was successfully edited'})
-            $location.path($scope.locale + '/profile')
+            $location.path(($scope.locale ? $scope.locale : '') + '/profile')
         };
         var presenter = usecaseAdapterFactory($scope, onSuccess);
         var baseUri = config.baseUri || '';

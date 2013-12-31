@@ -113,11 +113,19 @@ describe('customer address', function() {
                 expect(rest.calls[0].args[0]).toEqual(presenter);
             });
 
-            it('on success put payload on scope and redirect to profile', function() {
-                scope.locale = 'locale';
-                usecaseAdapter.calls[0].args[1]();
-                expect(dispatcherMock['system.success']).toEqual({code:'customer.address.add.success', default:'Address was successfully added'});
-                expect(location.path()).toEqual('/locale/profile')
+            describe('on success put payload on scope and redirect to profile', function() {
+                it('when locale is known', function() {
+                    scope.locale = 'locale';
+                    usecaseAdapter.calls[0].args[1]();
+                    expect(dispatcherMock['system.success']).toEqual({code:'customer.address.add.success', default:'Address was successfully added'});
+                    expect(location.path()).toEqual('/locale/profile')
+                });
+
+                it('when locale is undefined', function() {
+                    scope.locale = undefined;
+                    usecaseAdapter.calls[0].args[1]();
+                    expect(location.path()).toEqual('/profile')
+                });
             });
 
             it('with base-uri', function() {
@@ -246,6 +254,21 @@ describe('customer address', function() {
                 usecaseAdapter.calls[0].args[1]();
                 expect(dispatcherMock['system.success']).toEqual({code:'customer.address.edit.success', default:'Address was successfully edited'});
                 expect(location.path()).toEqual('/locale/profile');
+            });
+
+            describe('on success put payload on scope and redirect to profile', function() {
+                it('when locale is known', function() {
+                    scope.locale = 'locale';
+                    usecaseAdapter.calls[0].args[1]();
+                    expect(dispatcherMock['system.success']).toEqual({code:'customer.address.edit.success', default:'Address was successfully edited'});
+                    expect(location.path()).toEqual('/locale/profile');
+                });
+
+                it('when locale is undefined', function() {
+                    scope.locale = undefined;
+                    usecaseAdapter.calls[0].args[1]();
+                    expect(location.path()).toEqual('/profile')
+                });
             });
         });
     });
