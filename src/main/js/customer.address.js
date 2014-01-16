@@ -1,8 +1,9 @@
 angular.module('customer.address', ['angular.usecase.adapter', 'rest.client'])
-    .controller('CustomerAddressController', ['$scope', 'usecaseAdapterFactory', 'restServiceHandler', 'config', 'topicMessageDispatcher', '$location', CustomerAddressController])
-    .controller('EditCustomerAddressController', ['$scope', 'usecaseAdapterFactory', '$routeParams', 'restServiceHandler', 'config', 'topicMessageDispatcher', '$location', EditCustomerAddressController]);
+    .controller('CustomerAddressController', ['$scope', 'usecaseAdapterFactory', 'restServiceHandler', 'config', 'topicMessageDispatcher', '$location', 'removeAddress', CustomerAddressController])
+    .controller('EditCustomerAddressController', ['$scope', 'usecaseAdapterFactory', '$routeParams', 'restServiceHandler', 'config', 'topicMessageDispatcher', '$location', EditCustomerAddressController])
+    .factory('removeAddress', ['usecaseAdapterFactory', 'restServiceHandler', 'config', RemoveAddressFactory]);
 
-function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHandler, config, topicMessageDispatcher, $location) {
+function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHandler, config, topicMessageDispatcher, $location, removeAddress) {
     $scope.countries = config.countries;
     $scope.countryFor = function (code) {
         return $scope.countries.forEach(function (c) {
@@ -39,6 +40,7 @@ function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHan
             withCredentials: true,
             url: baseUri + 'api/entity/customer-address',
             data: {
+                addressee: $scope.addressee || '',
                 label: $scope.label || '',
                 street: $scope.street || '',
                 number: $scope.number || '',
@@ -52,7 +54,15 @@ function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHan
 
     $scope.rejected = function () {
         return !$scope.violations.empty;
-    }
+    };
+
+    $scope.remove = function(label) {
+        var onSuccess = function() {
+            $scope.init();
+            topicMessageDispatcher.fire('system.success', {code: 'customer.address.delete.success', default: 'Address was successfully removed'});
+        };
+        removeAddress({label: label}, onSuccess);
+    };
 }
 
 function EditCustomerAddressController($scope, usecaseAdapterFactory, $routeParams, restServiceHandler, config, topicMessageDispatcher, $location) {
@@ -89,6 +99,7 @@ function EditCustomerAddressController($scope, usecaseAdapterFactory, $routePara
             url: baseUri + 'api/entity/customer-address',
             data: {
                 id: {label: $scope.label},
+                addressee: $scope.address.addressee,
                 label: $scope.address.label,
                 street: $scope.address.street,
                 number: $scope.address.number,
@@ -98,6 +109,22 @@ function EditCustomerAddressController($scope, usecaseAdapterFactory, $routePara
                 context: 'update'
             }
         };
+        restServiceHandler(presenter);
+    }
+}
+
+function RemoveAddressFactory(usecaseAdapterFactory, restServiceHandler, config) {
+    return function(scope, onSuccess) {
+        var presenter = usecaseAdapterFactory(scope);
+        presenter.params = {
+            method: 'DELETE',
+            withCredentials: true,
+            url: (config.baseUri || '') + 'api/entity/customer-address/'+scope.label,
+            data: {
+                id: {label: scope.label}
+            }
+        };
+        presenter.success = onSuccess;
         restServiceHandler(presenter);
     }
 }

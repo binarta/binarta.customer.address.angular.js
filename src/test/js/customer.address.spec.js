@@ -24,9 +24,10 @@ describe('customer address', function() {
     }));
 
     describe('CustomerAddressController', function() {
+        var removeAddress = jasmine.createSpy('removeAddressSpy');
         beforeEach(inject(function($controller) {
             config = {};
-            ctrl = $controller(CustomerAddressController, {$scope: scope, config: config});
+            ctrl = $controller(CustomerAddressController, {$scope: scope, config: config, removeAddress: removeAddress});
         }));
 
         describe('on init', function() {
@@ -73,8 +74,24 @@ describe('customer address', function() {
             });
         });
 
+        describe('on delete', function() {
+            beforeEach(function() {
+                scope.remove('label');
+            });
+
+            it('calls remove address with label', function() {
+                expect(removeAddress.calls[0].args[0]).toEqual({label: 'label'});
+            });
+
+            it('presenter sends notification', function() {
+                removeAddress.calls[1].args[1]();
+                expect(dispatcherMock['system.success']).toEqual({code:'customer.address.delete.success', default:'Address was successfully removed'})
+            })
+        });
+
         describe('on submit', function() {
             beforeEach(function() {
+                scope.addressee = 'addressee';
                 scope.label = 'label';
                 scope.street = 'street-name';
                 scope.number = '1';
@@ -91,6 +108,7 @@ describe('customer address', function() {
             it('presenter params get populated', function() {
                 expect(presenter.params).toEqual({method: 'PUT', withCredentials: true, url: 'api/entity/customer-address',
                     data: {
+                        addressee: scope.addressee,
                         label: scope.label,
                         street: scope.street,
                         number: scope.number,
@@ -100,7 +118,7 @@ describe('customer address', function() {
                     }})
             });
 
-            ['label', 'street', 'number', 'city', 'country'].forEach(function(item) {
+            ['addressee', 'label', 'street', 'number', 'city', 'country'].forEach(function(item) {
                 it("when " + item + " is null then it's passed as empty string", function() {
                     scope[item] = null;
                     scope.submit();
@@ -197,6 +215,7 @@ describe('customer address', function() {
         describe('on submit', function() {
             beforeEach(function() {
                 scope.address = {};
+                scope.address.addressee = 'addressee';
                 scope.address.label = 'label';
                 scope.address.street = 'street';
                 scope.address.number = '1';
@@ -218,6 +237,7 @@ describe('customer address', function() {
                 expect(presenter.params).toEqual({method: 'POST',
                     data: {
                         id: {label: scope.label},
+                        addressee: scope.address.addressee,
                         label: scope.address.label,
                         street: scope.address.street,
                         number: scope.address.number,
@@ -237,6 +257,7 @@ describe('customer address', function() {
                 expect(presenter.params).toEqual({method: 'POST',
                     data: {
                         id: {label:scope.label},
+                        addressee: scope.address.addressee,
                         label: scope.address.label,
                         street: scope.address.street,
                         number: scope.address.number,
@@ -271,5 +292,47 @@ describe('customer address', function() {
                 });
             });
         });
+    });
+
+    describe('RemoveAddress', function() {
+        var service;
+        var onSuccess = function() {};
+
+        beforeEach(function() {
+            scope.label = 'label';
+            service = RemoveAddressFactory(usecaseAdapter, rest, {baseUri: 'base-uri/'});
+            service(scope, onSuccess);
+        });
+
+        it('passes the scope to the usecase factory', function() {
+            expect(usecaseAdapter.calls[0].args[0]).toEqual(scope);
+        });
+
+        it('sends DELETE request', function() {
+            expect(presenter.params.method).toEqual('DELETE');
+        });
+
+        it('sends credentials', function() {
+            expect(presenter.params.withCredentials).toEqual(true);
+        });
+
+        it('sends request to entity resource with base uri', function() {
+            expect(presenter.params.url).toEqual('base-uri/api/entity/customer-address/'+scope.label);
+        });
+
+        it('sends request to entity resource without base uri', function() {
+            service = RemoveAddressFactory(usecaseAdapter, rest, {});
+            service(scope, onSuccess);
+
+            expect(presenter.params.url).toEqual('api/entity/customer-address/'+scope.label);
+        });
+
+        it('sets the success handler', function() {
+            expect(presenter.success).toEqual(onSuccess);
+        });
+
+        it('test', function() {
+            expect(rest.calls[0].args[0]).toEqual(presenter);
+        })
     });
 });
