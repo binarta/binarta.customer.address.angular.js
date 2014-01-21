@@ -1,7 +1,9 @@
 angular.module('customer.address', ['angular.usecase.adapter', 'rest.client'])
     .controller('CustomerAddressController', ['$scope', 'usecaseAdapterFactory', 'restServiceHandler', 'config', 'topicMessageDispatcher', '$location', 'removeAddress', CustomerAddressController])
     .controller('EditCustomerAddressController', ['$scope', 'usecaseAdapterFactory', '$routeParams', 'restServiceHandler', 'config', 'topicMessageDispatcher', '$location', EditCustomerAddressController])
-    .factory('removeAddress', ['usecaseAdapterFactory', 'restServiceHandler', 'config', RemoveAddressFactory]);
+    .factory('removeAddress', ['usecaseAdapterFactory', 'restServiceHandler', 'config', RemoveAddressFactory])
+    .factory('viewCustomerAddress', ['usecaseAdapterFactory', 'config', 'restServiceHandler', ViewCustomerAddressFactory])
+;
 
 function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHandler, config, topicMessageDispatcher, $location, removeAddress) {
     $scope.countries = config.countries;
@@ -13,6 +15,11 @@ function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHan
             return null;
         });
     };
+
+    $scope.onSuccessRedirectoToCurrent = function() {
+        config.onCreateAddressReturnTarget = $location.path();
+    };
+
     $scope.init = function () {
         var onSuccess = function (payload) {
             $scope.addresses = payload;
@@ -31,7 +38,11 @@ function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHan
     $scope.submit = function () {
         var onSuccess = function () {
             topicMessageDispatcher.fire('system.success', {code: 'customer.address.add.success', default: 'Address was successfully added'})
-            $location.path(($scope.locale ? $scope.locale : '') + '/profile');
+            if (config.onCreateAddressReturnTarget) {
+                $location.url(config.onCreateAddressReturnTarget + '?' + $location.search().type + '=' + $scope.label);
+            } else {
+                $location.path(($scope.locale ? $scope.locale : '') + '/profile');
+            }
         };
         var presenter = usecaseAdapterFactory($scope, onSuccess);
         var baseUri = config.baseUri || '';
@@ -65,25 +76,16 @@ function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHan
     };
 }
 
-function EditCustomerAddressController($scope, usecaseAdapterFactory, $routeParams, restServiceHandler, config, topicMessageDispatcher, $location) {
+function EditCustomerAddressController($scope, usecaseAdapterFactory, $routeParams, restServiceHandler, config, topicMessageDispatcher, $location, viewCustomerAddress) {
     $scope.countries = config.countries;
+
     $scope.init = function () {
+        $scope.label = $routeParams.label;
         var onSuccess = function (payload) {
             $scope.address = payload;
             $scope.label = payload.label;
         };
-        var baseUri = config.baseUri || '';
-        var presenter = usecaseAdapterFactory($scope, onSuccess);
-        presenter.params = {
-            method: 'GET',
-            withCredentials: true,
-            url: baseUri + 'api/entity/customer-address',
-            params: {
-                label: $routeParams.label
-            }
-        };
-
-        restServiceHandler(presenter);
+        viewCustomerAddress($scope, onSuccess);
     };
 
     $scope.submit = function () {
@@ -126,5 +128,23 @@ function RemoveAddressFactory(usecaseAdapterFactory, restServiceHandler, config)
         };
         presenter.success = onSuccess;
         restServiceHandler(presenter);
+    }
+}
+
+function ViewCustomerAddressFactory(usecaseAdapterFactory, config, restServiceHandler) {
+    function baseUri() {
+        return config.baseUri || '';
+    }
+    return function(scope, onSuccess) {
+        var context = usecaseAdapterFactory(scope, onSuccess);
+        context.params = {
+            method: 'GET',
+            params: {
+                label: scope.label
+            },
+            url: baseUri() + 'api/entity/customer-address',
+            withCredentials: true
+        };
+        restServiceHandler(context);
     }
 }

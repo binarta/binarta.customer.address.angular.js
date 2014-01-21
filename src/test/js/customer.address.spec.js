@@ -4,16 +4,18 @@ describe('customer address', function() {
     var usecaseAdapter;
     var presenter = {};
     var rest;
-    var config = {};
+    var configMock = {};
     var dispatcher;
     var dispatcherMock;
     var location;
+    var service;
 
     beforeEach(module('customer.address'));
     beforeEach(module('angular.usecase.adapter'));
     beforeEach(module('rest.client'));
     beforeEach(module('notifications'));
-    beforeEach(inject(function($rootScope, $location, usecaseAdapterFactory, restServiceHandler, topicMessageDispatcher, topicMessageDispatcherMock) {
+    beforeEach(module('config'));
+    beforeEach(inject(function($rootScope, $location, usecaseAdapterFactory, restServiceHandler, topicMessageDispatcher, topicMessageDispatcherMock, config) {
         scope = $rootScope.$new();
         usecaseAdapter = usecaseAdapterFactory;
         usecaseAdapter.andReturn(presenter);
@@ -21,14 +23,25 @@ describe('customer address', function() {
         dispatcher = topicMessageDispatcher;
         dispatcherMock = topicMessageDispatcherMock;
         location = $location;
+        configMock = config;
     }));
 
     describe('CustomerAddressController', function() {
         var removeAddress = jasmine.createSpy('removeAddressSpy');
         beforeEach(inject(function($controller) {
-            config = {};
-            ctrl = $controller(CustomerAddressController, {$scope: scope, config: config, removeAddress: removeAddress});
+            configMock = {};
+            ctrl = $controller(CustomerAddressController, {$scope: scope, config: configMock, removeAddress: removeAddress});
         }));
+
+        describe('on success redirect to current', function() {
+            beforeEach(inject(function() {
+                scope.onSuccessRedirectoToCurrent();
+            }));
+
+            it('targe is placed on config as current location', function() {
+                expect(configMock.onCreateAddressReturnTarget).toEqual(location.path());
+            });
+        });
 
         describe('on init', function() {
             beforeEach(function() {
@@ -61,7 +74,7 @@ describe('customer address', function() {
 
             describe('with baseUri', function() {
                 beforeEach(function() {
-                    config.baseUri = 'base-uri/';
+                    configMock.baseUri = 'base-uri/';
                     scope.init();
                 });
 
@@ -147,7 +160,7 @@ describe('customer address', function() {
             });
 
             it('with base-uri', function() {
-                config.baseUri = 'base-uri/';
+                configMock.baseUri = 'base-uri/';
                 scope.submit();
 
                 expect(presenter.params.url).toEqual('base-uri/api/entity/customer-address');
@@ -156,12 +169,51 @@ describe('customer address', function() {
         });
     });
 
+    describe('viewCustomerAddress', function() {
+        var success = function() {}
+
+        beforeEach(inject(function(viewCustomerAddress) {
+            service = viewCustomerAddress;
+            scope.label = 'label';
+            service(scope, success);
+        }));
+
+        it('passes the scope to usecase adapter factory', function() {
+            expect(usecaseAdapter.mostRecentCall.args[0]).toEqual(scope);
+        });
+
+        it('test', function() {
+            expect(usecaseAdapter.mostRecentCall.args[1]).toEqual(success);
+        });
+
+        it('url is not prefixed', function () {
+            expect(presenter.params.method).toEqual('GET');
+            expect(presenter.params.params).toEqual({label:scope.label});
+            expect(presenter.params.url).toEqual('api/entity/customer-address');
+            expect(presenter.params.withCredentials).toEqual(true);
+        });
+
+        it('url is prefixed', function() {
+            configMock.baseUri = 'baseUri/';
+            service(scope);
+
+            expect(presenter.params.url).toEqual('baseUri/api/entity/customer-address');
+        });
+
+        it('calls the rest service with the presenter', function() {
+            expect(rest.calls[0].args[0]).toEqual(presenter);
+        });
+    });
+
     describe('EditCustomerAddressController', function() {
         var routeParams = {};
+        var viewCustomerAddress = jasmine.createSpy('viewCustomerAddress');
+        var address = {};
+
         beforeEach(inject(function($controller) {
-            config = {};
-            routeParams.label = 'label'
-            ctrl = $controller(EditCustomerAddressController, {$scope: scope, $routeParams: routeParams, config: config});
+            configMock = {};
+            routeParams.label = 'label';
+            ctrl = $controller(EditCustomerAddressController, {$scope: scope, $routeParams: routeParams, config: configMock, viewCustomerAddress: viewCustomerAddress});
         }));
 
         describe('on init', function() {
@@ -169,44 +221,24 @@ describe('customer address', function() {
                 scope.init();
             });
 
-            it('passes the scope to usecase adapter factory', function() {
-                expect(usecaseAdapter.calls[0].args[0]).toEqual(scope);
+            it('puts label from route on scope', function() {
+                expect(scope.label).toEqual(routeParams.label);
             });
 
-            it('url is not prefixed', function () {
-                expect(presenter.params).toEqual({method: 'GET',
-                    params: {label:routeParams.label},
-                    url: 'api/entity/customer-address',
-                    withCredentials:true});
+            it('passes scope to view customer address', function() {
+                expect(viewCustomerAddress.mostRecentCall.args[0]).toEqual(scope);
             });
 
-            it('url is prefixed', function() {
-                config.baseUri = 'baseUri/';
-                scope.init();
+            describe('when executing success callback', function() {
+                beforeEach(inject(function() {
+                    viewCustomerAddress.mostRecentCall.args[1](address);
+                }));
 
-                expect(presenter.params).toEqual({method: 'GET',
-                    params: {label:routeParams.label},
-                    url: 'baseUri/api/entity/customer-address',
-                    withCredentials:true});
-            });
-
-            it('calls the rest service with the presenter', function() {
-                expect(rest.calls[0].args[0]).toEqual(presenter);
-            });
-
-            describe('when handling success', function() {
-                var address = {};
-
-                beforeEach(function() {
-                    address.label ='original';
-                    usecaseAdapter.calls[0].args[1](address);
-                });
-
-                it('puts fetched address on the scope', function() {
+                it('payload gets put on scope as address', function() {
                     expect(scope.address).toEqual(address);
                 });
 
-                it('puts original label on the scope', function() {
+                it('payload label gets put on scope', function() {
                     expect(scope.label).toEqual(address.label);
                 });
             });
@@ -251,7 +283,7 @@ describe('customer address', function() {
             });
 
             it('url is prefixed', function() {
-                config.baseUri = 'baseUri/';
+                configMock.baseUri = 'baseUri/';
                 scope.submit();
 
                 expect(presenter.params).toEqual({method: 'POST',
