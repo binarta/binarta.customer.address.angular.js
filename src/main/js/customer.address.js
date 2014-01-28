@@ -35,7 +35,7 @@ function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHan
         var onSuccess = function () {
             topicMessageDispatcher.fire('system.success', {code: 'customer.address.add.success', default: 'Address was successfully added'})
             if ($location.search().redirectTo) {
-                $location.url(pathToRedirectTo() + '?' + $location.search().type + '=' + $scope.label);
+                $location.url(pathToRedirectTo());
             } else {
                 $location.path(pathToProfile());
             }
@@ -84,7 +84,9 @@ function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHan
     }
 
     function pathToRedirectTo() {
-        return ($scope.locale ? $scope.locale : '') + $location.search().redirectTo;
+        var queryString = '';
+        if($location.search().type) queryString = '?' + $location.search().type + '=' + $scope.label;
+        return ($scope.locale ? $scope.locale : '') + $location.search().redirectTo + queryString;
     }
 }
 

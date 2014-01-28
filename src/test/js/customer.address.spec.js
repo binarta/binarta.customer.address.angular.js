@@ -180,6 +180,25 @@ describe('customer address', function() {
 
                     expect(location.path()).toEqual('/profile');
                 });
+
+                it('when type is set in query string assign label to type', function () {
+                    location.search().redirectTo = '/path';
+                    location.search().type = 'type';
+                    scope.label = 'label';
+
+                    usecaseAdapter.calls[0].args[1]();
+
+                    expect(location.search().type).toEqual(scope.label);
+                });
+
+                it('when type is not set in query string', function () {
+                    location.search().redirectTo = '/path';
+                    scope.label = 'label';
+
+                    usecaseAdapter.calls[0].args[1]();
+
+                    expect(location.search().type).toBeUndefined();
+                });
             });
 
             it('with base-uri', function() {
