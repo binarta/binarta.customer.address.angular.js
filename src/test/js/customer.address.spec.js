@@ -33,16 +33,6 @@ describe('customer address', function() {
             ctrl = $controller(CustomerAddressController, {$scope: scope, config: configMock, removeAddress: removeAddress});
         }));
 
-        describe('on success redirect to current', function() {
-            beforeEach(inject(function() {
-                scope.onSuccessRedirectoToCurrent();
-            }));
-
-            it('targe is placed on config as current location', function() {
-                expect(configMock.onCreateAddressReturnTarget).toEqual(location.path());
-            });
-        });
-
         describe('on init', function() {
             beforeEach(function() {
                 scope.init();
@@ -144,18 +134,51 @@ describe('customer address', function() {
                 expect(rest.calls[0].args[0]).toEqual(presenter);
             });
 
-            describe('on success put payload on scope and redirect to profile', function() {
-                it('when locale is known', function() {
-                    scope.locale = 'locale';
-                    usecaseAdapter.calls[0].args[1]();
-                    expect(dispatcherMock['system.success']).toEqual({code:'customer.address.add.success', default:'Address was successfully added'});
-                    expect(location.path()).toEqual('/locale/profile')
+            describe('on success put payload on scope ', function() {
+                describe('when locale is known', function() {
+                    beforeEach(function () {
+                        scope.locale = 'locale';
+                        usecaseAdapter.calls[0].args[1]();
+                    });
+
+                    it('dispatcher fires success message', function () {
+                        expect(dispatcherMock['system.success']).toEqual({code:'customer.address.add.success', default:'Address was successfully added'});
+                    });
+
+                    it('and redirectTo is set redirect to profile', function () {
+                        usecaseAdapter.calls[0].args[1]();
+
+                        expect(location.path()).toEqual('/locale/profile');
+                    });
                 });
 
                 it('when locale is undefined', function() {
                     scope.locale = undefined;
                     usecaseAdapter.calls[0].args[1]();
-                    expect(location.path()).toEqual('/profile')
+
+                    expect(location.path()).toEqual('/profile');
+                });
+
+                it('when redirectTo is set in query string and locale is known', function () {
+                    scope.locale = 'locale';
+                    location.search().redirectTo = '/current/path';
+                    usecaseAdapter.calls[0].args[1]();
+
+                    expect(location.path()).toEqual('/locale/current/path');
+                });
+
+                it('when redirectTo is set in query string and locale is unknown', function () {
+                    scope.locale = undefined;
+                    location.search().redirectTo = '/current/path';
+                    usecaseAdapter.calls[0].args[1]();
+
+                    expect(location.path()).toEqual('/current/path');
+                });
+
+                it('when redirectTo is not set redirect to profile', function () {
+                    usecaseAdapter.calls[0].args[1]();
+
+                    expect(location.path()).toEqual('/profile');
                 });
             });
 
@@ -166,6 +189,54 @@ describe('customer address', function() {
                 expect(presenter.params.url).toEqual('base-uri/api/entity/customer-address');
             });
 
+        });
+
+        describe('on cancel', function () {
+            describe('and redirectTo is set in query string and locale is known', function () {
+                beforeEach(function () {
+                    scope.locale = 'locale';
+                    location.search().redirectTo = '/current/path';
+                    scope.cancel();
+                });
+
+                it('redirect to path', function () {
+                    expect(location.path()).toEqual('/locale/current/path');
+                });
+            });
+
+            describe('and redirectTo is set in query string and locale is unknown', function () {
+                beforeEach(function () {
+                    scope.locale = undefined;
+                    location.search().redirectTo = '/current/path';
+                    scope.cancel();
+                });
+
+                it('redirect to path', function () {
+                    expect(location.path()).toEqual('/current/path');
+                });
+            });
+
+            describe('and redirectTo is not set in query string and locale is known', function () {
+                beforeEach(function () {
+                    scope.locale = 'locale';
+                    scope.cancel();
+                });
+
+                it('redirect to profile', function () {
+                    expect(location.path()).toEqual('/locale/profile');
+                });
+            });
+
+            describe('and redirectTo is not set in query string and locale is unknown', function () {
+                beforeEach(function () {
+                    scope.locale = undefined;
+                    scope.cancel();
+                });
+
+                it('redirect to profile', function () {
+                    expect(location.path()).toEqual('/profile');
+                });
+            });
         });
     });
 
@@ -310,20 +381,100 @@ describe('customer address', function() {
             });
 
             describe('on success put payload on scope and redirect to profile', function() {
-                it('when locale is known', function() {
-                    scope.locale = 'locale';
-                    usecaseAdapter.calls[0].args[1]();
-                    expect(dispatcherMock['system.success']).toEqual({code:'customer.address.edit.success', default:'Address was successfully edited'});
-                    expect(location.path()).toEqual('/locale/profile');
+                describe('when locale is known', function() {
+                    beforeEach(function () {
+                        scope.locale = 'locale';
+                    });
+
+                    it('dispatcher fires success message', function () {
+                        usecaseAdapter.calls[0].args[1]();
+
+                        expect(dispatcherMock['system.success']).toEqual({code:'customer.address.edit.success', default:'Address was successfully edited'});
+                    });
+
+                    it('and redirectTo is set in query string', function () {
+                        location.search().redirectTo = '/path';
+                        usecaseAdapter.calls[0].args[1]();
+
+                        expect(location.path()).toEqual('/locale/path');
+                    });
+
+                    it('and redirectTo is not set in query string', function () {
+                        usecaseAdapter.calls[0].args[1]();
+
+                        expect(location.path()).toEqual('/locale/profile');
+                    });
                 });
 
-                it('when locale is undefined', function() {
-                    scope.locale = undefined;
-                    usecaseAdapter.calls[0].args[1]();
-                    expect(location.path()).toEqual('/profile')
+                describe('when locale is undefined', function() {
+                    beforeEach(function () {
+                        scope.locale = undefined;
+                    });
+
+                    it('and redirectTo is set in query string', function () {
+                        location.search().redirectTo = '/path';
+                        usecaseAdapter.calls[0].args[1]();
+
+                        expect(location.path()).toEqual('/path');
+                    });
+
+                    it('and redirectTo is not set in query string', function () {
+                        usecaseAdapter.calls[0].args[1]();
+
+                        expect(location.path()).toEqual('/profile');
+                    });
                 });
             });
         });
+
+        describe('on cancel', function () {
+            describe('and redirectTo is set in query string and locale is known', function () {
+                beforeEach(function () {
+                    scope.locale = 'locale';
+                    location.search().redirectTo = '/current/path';
+                    scope.cancel();
+                });
+
+                it('redirect to path', function () {
+                    expect(location.path()).toEqual('/locale/current/path');
+                });
+            });
+
+            describe('and redirectTo is set in query string and locale is unknown', function () {
+                beforeEach(function () {
+                    scope.locale = undefined;
+                    location.search().redirectTo = '/current/path';
+                    scope.cancel();
+                });
+
+                it('redirect to path', function () {
+                    expect(location.path()).toEqual('/current/path');
+                });
+            });
+
+            describe('and redirectTo is not set in query string and locale is known', function () {
+                beforeEach(function () {
+                    scope.locale = 'locale';
+                    scope.cancel();
+                });
+
+                it('redirect to profile', function () {
+                    expect(location.path()).toEqual('/locale/profile');
+                });
+            });
+
+            describe('and redirectTo is not set in query string and locale is unknown', function () {
+                beforeEach(function () {
+                    scope.locale = undefined;
+                    scope.cancel();
+                });
+
+                it('redirect to profile', function () {
+                    expect(location.path()).toEqual('/profile');
+                });
+            });
+        });
+
     });
 
     describe('RemoveAddress', function() {

@@ -16,10 +16,6 @@ function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHan
         });
     };
 
-    $scope.onSuccessRedirectoToCurrent = function() {
-        config.onCreateAddressReturnTarget = $location.path();
-    };
-
     $scope.init = function () {
         var onSuccess = function (payload) {
             $scope.addresses = payload;
@@ -38,10 +34,10 @@ function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHan
     $scope.submit = function () {
         var onSuccess = function () {
             topicMessageDispatcher.fire('system.success', {code: 'customer.address.add.success', default: 'Address was successfully added'})
-            if (config.onCreateAddressReturnTarget) {
-                $location.url(config.onCreateAddressReturnTarget + '?' + $location.search().type + '=' + $scope.label);
+            if ($location.search().redirectTo) {
+                $location.url(pathToRedirectTo() + '?' + $location.search().type + '=' + $scope.label);
             } else {
-                $location.path(($scope.locale ? $scope.locale : '') + '/profile');
+                $location.path(pathToProfile());
             }
         };
         var presenter = usecaseAdapterFactory($scope, onSuccess);
@@ -74,6 +70,22 @@ function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHan
         };
         removeAddress({label: label}, onSuccess);
     };
+
+    $scope.cancel = function () {
+        if ($location.search().redirectTo) {
+            $location.url(pathToRedirectTo());
+        } else {
+            $location.path(pathToProfile());
+        }
+    };
+
+    function pathToProfile() {
+        return ($scope.locale ? $scope.locale : '') + '/profile';
+    }
+
+    function pathToRedirectTo() {
+        return ($scope.locale ? $scope.locale : '') + $location.search().redirectTo;
+    }
 }
 
 function EditCustomerAddressController($scope, usecaseAdapterFactory, $routeParams, restServiceHandler, config, topicMessageDispatcher, $location, viewCustomerAddress) {
@@ -90,8 +102,12 @@ function EditCustomerAddressController($scope, usecaseAdapterFactory, $routePara
 
     $scope.submit = function () {
         var onSuccess = function () {
-            topicMessageDispatcher.fire('system.success', {code: 'customer.address.edit.success', default: 'Address was successfully edited'})
-            $location.path(($scope.locale ? $scope.locale : '') + '/profile')
+            topicMessageDispatcher.fire('system.success', {code: 'customer.address.edit.success', default: 'Address was successfully edited'});
+            if ($location.search().redirectTo) {
+                $location.url(pathToRedirectTo());
+            } else {
+                $location.path(pathToProfile());
+            }
         };
         var presenter = usecaseAdapterFactory($scope, onSuccess);
         var baseUri = config.baseUri || '';
@@ -112,6 +128,22 @@ function EditCustomerAddressController($scope, usecaseAdapterFactory, $routePara
             }
         };
         restServiceHandler(presenter);
+    }
+
+    $scope.cancel = function () {
+        if ($location.search().redirectTo) {
+            $location.url(pathToRedirectTo());
+        } else {
+            $location.path(pathToProfile());
+        }
+    };
+
+    function pathToProfile() {
+        return ($scope.locale ? $scope.locale : '') + '/profile';
+    }
+
+    function pathToRedirectTo() {
+        return ($scope.locale ? $scope.locale : '') + $location.search().redirectTo;
     }
 }
 
