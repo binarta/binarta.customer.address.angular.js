@@ -181,29 +181,6 @@ describe('customer address', function() {
                     expect(location.path()).toEqual('/profile');
                 });
 
-                describe('when type is set in querystring', function () {
-                    beforeEach(function () {
-                        location.search().redirectTo = '/path';
-                        location.search().type = 'type';
-                    });
-
-                    it('and label is known', function () {
-                        scope.label = 'label';
-
-                        usecaseAdapter.calls[0].args[1]();
-
-                        expect(location.search().type).toEqual(scope.label);
-                    });
-
-                    it('and label is unknown', function () {
-                        scope.label = undefined;
-
-                        usecaseAdapter.calls[0].args[1]();
-
-                        expect(location.search()).toEqual({});
-                    });
-                });
-
                 it('when type is not set in query string', function () {
                     location.search().redirectTo = '/path';
                     scope.label = 'label';
