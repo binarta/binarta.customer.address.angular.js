@@ -181,14 +181,27 @@ describe('customer address', function() {
                     expect(location.path()).toEqual('/profile');
                 });
 
-                it('when type is set in query string assign label to type', function () {
-                    location.search().redirectTo = '/path';
-                    location.search().type = 'type';
-                    scope.label = 'label';
+                describe('when type is set in querystring', function () {
+                    beforeEach(function () {
+                        location.search().redirectTo = '/path';
+                        location.search().type = 'type';
+                    });
 
-                    usecaseAdapter.calls[0].args[1]();
+                    it('and label is known', function () {
+                        scope.label = 'label';
 
-                    expect(location.search().type).toEqual(scope.label);
+                        usecaseAdapter.calls[0].args[1]();
+
+                        expect(location.search().type).toEqual(scope.label);
+                    });
+
+                    it('and label is unknown', function () {
+                        scope.label = undefined;
+
+                        usecaseAdapter.calls[0].args[1]();
+
+                        expect(location.search()).toEqual({});
+                    });
                 });
 
                 it('when type is not set in query string', function () {

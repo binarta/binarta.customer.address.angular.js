@@ -85,7 +85,7 @@ function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHan
 
     function pathToRedirectTo() {
         var queryString = '';
-        if($location.search().type) queryString = '?' + $location.search().type + '=' + $scope.label;
+        if($location.search().type && $scope.label) queryString = '?' + $location.search().type + '=' + $scope.label;
         return ($scope.locale ? $scope.locale : '') + $location.search().redirectTo + queryString;
     }
 }
