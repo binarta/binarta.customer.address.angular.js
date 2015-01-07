@@ -1,6 +1,6 @@
 angular.module('customer.address', ['angular.usecase.adapter', 'rest.client'])
     .controller('CustomerAddressController', ['$scope', 'usecaseAdapterFactory', 'restServiceHandler', 'config', 'topicMessageDispatcher', '$location', 'removeAddress', CustomerAddressController])
-    .controller('EditCustomerAddressController', ['$scope', 'usecaseAdapterFactory', '$routeParams', 'restServiceHandler', 'config', 'topicMessageDispatcher', '$location', EditCustomerAddressController])
+    .controller('EditCustomerAddressController', ['$scope', 'usecaseAdapterFactory', '$routeParams', 'restServiceHandler', 'config', 'topicMessageDispatcher', '$location', 'viewCustomerAddress', EditCustomerAddressController])
     .factory('removeAddress', ['usecaseAdapterFactory', 'restServiceHandler', 'config', RemoveAddressFactory])
     .factory('viewCustomerAddress', ['usecaseAdapterFactory', 'config', 'restServiceHandler', ViewCustomerAddressFactory])
 ;
@@ -91,8 +91,8 @@ function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHan
 function EditCustomerAddressController($scope, usecaseAdapterFactory, $routeParams, restServiceHandler, config, topicMessageDispatcher, $location, viewCustomerAddress) {
     $scope.countries = config.countries;
 
-    $scope.init = function () {
-        $scope.label = $routeParams.label;
+    $scope.init = function (args) {
+        $scope.label = (args ? args.label : undefined) || $routeParams.label;
         var onSuccess = function (payload) {
             $scope.address = payload;
             $scope.label = payload.label;

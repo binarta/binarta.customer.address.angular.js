@@ -305,6 +305,11 @@ describe('customer address', function() {
                 expect(scope.label).toEqual(routeParams.label);
             });
 
+            it('test', function() {
+                scope.init({label:'L'})
+                expect(scope.label).toEqual('L');
+            });
+
             it('passes scope to view customer address', function() {
                 expect(viewCustomerAddress.mostRecentCall.args[0]).toEqual(scope);
             });
