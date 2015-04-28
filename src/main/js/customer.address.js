@@ -1,9 +1,8 @@
-angular.module('customer.address', ['angular.usecase.adapter', 'rest.client'])
+angular.module('customer.address', ['angular.usecase.adapter', 'rest.client', 'config', 'notifications', 'ngRoute'])
     .controller('CustomerAddressController', ['$scope', 'usecaseAdapterFactory', 'restServiceHandler', 'config', 'topicMessageDispatcher', '$location', 'removeAddress', CustomerAddressController])
     .controller('EditCustomerAddressController', ['$scope', 'usecaseAdapterFactory', '$routeParams', 'restServiceHandler', 'config', 'topicMessageDispatcher', '$location', 'viewCustomerAddress', EditCustomerAddressController])
     .factory('removeAddress', ['usecaseAdapterFactory', 'restServiceHandler', 'config', RemoveAddressFactory])
-    .factory('viewCustomerAddress', ['usecaseAdapterFactory', 'config', 'restServiceHandler', ViewCustomerAddressFactory])
-;
+    .factory('viewCustomerAddress', ['usecaseAdapterFactory', 'config', 'restServiceHandler', ViewCustomerAddressFactory]);
 
 function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHandler, config, topicMessageDispatcher, $location, removeAddress) {
     $scope.countries = config.countries;
@@ -33,7 +32,7 @@ function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHan
 
     $scope.submit = function () {
         var onSuccess = function () {
-            topicMessageDispatcher.fire('system.success', {code: 'customer.address.add.success', default: 'Address was successfully added'})
+            topicMessageDispatcher.fire('system.success', {code: 'customer.address.add.success', default: 'Address was successfully added'});
             if ($location.search().redirectTo) {
                 $location.url(pathToRedirectTo());
             } else {
@@ -47,13 +46,13 @@ function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHan
             withCredentials: true,
             url: baseUri + 'api/entity/customer-address',
             data: {
-                addressee: $scope.addressee || '',
-                label: $scope.label || '',
-                street: $scope.street || '',
-                number: $scope.number || '',
-                zip: $scope.zip || '',
-                city: $scope.city || '',
-                country: $scope.country || ''
+                addressee: $scope.address ? $scope.address.addressee : $scope.addressee || '',
+                label: $scope.address ? $scope.address.label : $scope.label || '',
+                street: $scope.address ? $scope.address.street : $scope.street || '',
+                number: $scope.address ? $scope.address.number : $scope.number || '',
+                zip: $scope.address ? $scope.address.zip : $scope.zip || '',
+                city: $scope.address ? $scope.address.city : $scope.city || '',
+                country: $scope.address ? $scope.address.country : $scope.country || ''
             }
         };
         restServiceHandler(presenter);
@@ -128,7 +127,7 @@ function EditCustomerAddressController($scope, usecaseAdapterFactory, $routePara
             }
         };
         restServiceHandler(presenter);
-    }
+    };
 
     $scope.cancel = function () {
         if ($location.search().redirectTo) {

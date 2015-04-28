@@ -200,6 +200,34 @@ describe('customer address', function() {
 
         });
 
+        describe('on submit with address object', function() {
+            beforeEach(function() {
+                scope.address = {
+                    addressee: 'addressee',
+                    label: 'label',
+                    street: 'street-name',
+                    number: '1',
+                    zip: '1234',
+                    city: 'city-name',
+                    country: 'country-name'
+                };
+                scope.submit();
+            });
+
+            it('presenter params get populated', function() {
+                expect(presenter.params).toEqual({method: 'PUT', withCredentials: true, url: 'api/entity/customer-address',
+                    data: {
+                        addressee: scope.address.addressee,
+                        label: scope.address.label,
+                        street: scope.address.street,
+                        number: scope.address.number,
+                        zip: scope.address.zip,
+                        city: scope.address.city,
+                        country: scope.address.country
+                    }});
+            });
+        });
+
         describe('on cancel', function () {
             describe('and redirectTo is set in query string and locale is known', function () {
                 beforeEach(function () {
