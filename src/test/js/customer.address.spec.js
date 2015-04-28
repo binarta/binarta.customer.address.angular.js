@@ -191,6 +191,19 @@ describe('customer address', function() {
                 });
             });
 
+            describe('with noRedirect arg and on success', function() {
+                beforeEach(function () {
+                    usecaseAdapter.reset();
+                    location.path('/');
+                    scope.submit({noRedirect: true});
+                    usecaseAdapter.calls[0].args[1]();
+                });
+
+                it('do not redirect', function () {
+                    expect(location.path()).toEqual('/');
+                });
+            });
+
             it('with base-uri', function() {
                 configMock.baseUri = 'base-uri/';
                 scope.submit();
@@ -334,7 +347,7 @@ describe('customer address', function() {
             });
 
             it('test', function() {
-                scope.init({label:'L'})
+                scope.init({label:'L'});
                 expect(scope.label).toEqual('L');
             });
 
@@ -465,6 +478,19 @@ describe('customer address', function() {
 
                         expect(location.path()).toEqual('/profile');
                     });
+                });
+            });
+
+            describe('with noRedirect arg and on success', function() {
+                beforeEach(function () {
+                    usecaseAdapter.reset();
+                    location.path('/');
+                    scope.submit({noRedirect: true});
+                    usecaseAdapter.calls[0].args[1]();
+                });
+
+                it('do not redirect', function () {
+                    expect(location.path()).toEqual('/');
                 });
             });
         });

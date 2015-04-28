@@ -30,14 +30,10 @@ function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHan
         restServiceHandler(presenter);
     };
 
-    $scope.submit = function () {
+    $scope.submit = function (args) {
         var onSuccess = function () {
             topicMessageDispatcher.fire('system.success', {code: 'customer.address.add.success', default: 'Address was successfully added'});
-            if ($location.search().redirectTo) {
-                $location.url(pathToRedirectTo());
-            } else {
-                $location.path(pathToProfile());
-            }
+            if (!(args && args.noRedirect)) $location.search().redirectTo ? $location.url(pathToRedirectTo()) : $location.path(pathToProfile());
         };
         var presenter = usecaseAdapterFactory($scope, onSuccess);
         var baseUri = config.baseUri || '';
@@ -99,14 +95,10 @@ function EditCustomerAddressController($scope, usecaseAdapterFactory, $routePara
         viewCustomerAddress($scope, onSuccess);
     };
 
-    $scope.submit = function () {
+    $scope.submit = function (args) {
         var onSuccess = function () {
             topicMessageDispatcher.fire('system.success', {code: 'customer.address.edit.success', default: 'Address was successfully edited'});
-            if ($location.search().redirectTo) {
-                $location.url(pathToRedirectTo());
-            } else {
-                $location.path(pathToProfile());
-            }
+            if (!(args && args.noRedirect)) $location.search().redirectTo ? $location.url(pathToRedirectTo()) : $location.path(pathToProfile());
         };
         var presenter = usecaseAdapterFactory($scope, onSuccess);
         var baseUri = config.baseUri || '';
