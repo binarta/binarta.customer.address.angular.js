@@ -1,0 +1,40 @@
+{
+  "msgs":{
+    "default":{
+      "customer.address.addressee.label": "Full name",
+      "customer.address.street.label": "Street",
+      "customer.address.number.label": "Number",
+      "customer.address.city.label": "City",
+      "customer.address.zip.label": "Postal code",
+      "customer.address.country.label": "Country"
+    }, "nl":{
+      "customer.address.addressee.label": "Geadresseerde",
+      "customer.address.street.label": "Straat",
+      "customer.address.number.label": "Huisnummer",
+      "customer.address.city.label": "Gemeente",
+      "customer.address.zip.label": "Postcode",
+      "customer.address.country.label": "Land"
+    }, "en":{
+      "customer.address.addressee.label": "Full name",
+      "customer.address.street.label": "Street",
+      "customer.address.number.label": "Number",
+      "customer.address.city.label": "City",
+      "customer.address.zip.label": "Postal code",
+      "customer.address.country.label": "Country"
+    }, "fr":{
+      "customer.address.addressee.label": "Destinataire",
+      "customer.address.street.label": "Rue",
+      "customer.address.number.label": "Numéro de la maison",
+      "customer.address.city.label": "Ville",
+      "customer.address.zip.label": "Code postal",
+      "customer.address.country.label": "Pays"
+    }, "de":{
+      "customer.address.addressee.label": "Empfänger",
+      "customer.address.street.label": "Straße",
+      "customer.address.number.label": "Hausnummer",
+      "customer.address.city.label": "Ort",
+      "customer.address.zip.label": "Postleitzahl",
+      "customer.address.country.label": "Land"
+    }
+  }
+}

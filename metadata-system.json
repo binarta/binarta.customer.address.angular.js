@@ -1,0 +1,55 @@
+{
+  "msgs":{
+    "default":{
+      "customer.address.add.success": "Address was successfully added",
+      "customer.address.delete.success": "Address was successfully removed",
+      "customer.address.edit.success": "Address was successfully edited",
+      "customer.address.addressee.required": "Addressee is required",
+      "customer.address.street.required": "Street is required",
+      "customer.address.number.required": "Number is required",
+      "customer.address.city.required": "City is required",
+      "customer.address.zip.required": "Postal code is required",
+      "customer.address.country.required": "Country is required"
+    }, "nl":{
+      "customer.address.add.success": "Adres opgeslagen",
+      "customer.address.delete.success": "Adres verwijderd",
+      "customer.address.edit.success": "Adres bewerkt",
+      "customer.address.addressee.required": "Geadresseerde is verplicht",
+      "customer.address.street.required": "Straat is verplicht",
+      "customer.address.number.required": "Huisnummer is verplicht",
+      "customer.address.city.required": "Gemeente is verplicht",
+      "customer.address.zip.required": "Postcode is verplicht",
+      "customer.address.country.required": "Land is verplicht"
+    }, "en":{
+      "customer.address.add.success": "Address was successfully added",
+      "customer.address.delete.success": "Address was successfully removed",
+      "customer.address.edit.success": "Address was successfully edited",
+      "customer.address.addressee.required": "Addressee is required",
+      "customer.address.street.required": "Street is required",
+      "customer.address.number.required": "Number is required",
+      "customer.address.city.required": "City is required",
+      "customer.address.zip.required": "Postal code is required",
+      "customer.address.country.required": "Country is required"
+    }, "fr":{
+      "customer.address.add.success": "Adresse enregistrée",
+      "customer.address.delete.success": "Adresse supprimée",
+      "customer.address.edit.success": "Adresse modifiée",
+      "customer.address.addressee.required": "Le champ \"Destinataire\" est obligatoire",
+      "customer.address.street.required": "Le champ \"Rue\" est obligatoire",
+      "customer.address.number.required": "Le champ \"Numéro de la maison\" est obligatoire",
+      "customer.address.city.required": "Le champ \"Ville\" est obligatoire",
+      "customer.address.zip.required": "Le champ \"Code postal\" est obligatoire",
+      "customer.address.country.required": "Le champ \"Pays\" est obligatoire"
+    }, "de":{
+      "customer.address.add.success": "Adresse gespeichert",
+      "customer.address.delete.success": "Adresse gelöscht",
+      "customer.address.edit.success": "Adresse bearbeitet",
+      "customer.address.addressee.required": "Eingabe des Empfängers obligatorisch",
+      "customer.address.street.required": "Eingabe der Straße obligatorisch",
+      "customer.address.number.required": "Eingabe der Hausnummer obligatorisch",
+      "customer.address.city.required": "Eingabe des Ortes obligatorisch",
+      "customer.address.zip.required": "Eingabe der Posteitzahl obligatorisch",
+      "customer.address.country.required": "Eingabe des Landes obligatorisch"
+    }
+  }
+}
