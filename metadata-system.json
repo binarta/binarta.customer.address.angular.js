@@ -1,16 +1,6 @@
 {
   "msgs":{
-    "default":{
-      "customer.address.add.success": "Address was successfully added",
-      "customer.address.delete.success": "Address was successfully removed",
-      "customer.address.edit.success": "Address was successfully edited",
-      "customer.address.addressee.required": "Addressee is required",
-      "customer.address.street.required": "Street is required",
-      "customer.address.number.required": "Number is required",
-      "customer.address.city.required": "City is required",
-      "customer.address.zip.required": "Postal code is required",
-      "customer.address.country.required": "Country is required"
-    }, "nl":{
+    "nl":{
       "customer.address.add.success": "Adres opgeslagen",
       "customer.address.delete.success": "Adres verwijderd",
       "customer.address.edit.success": "Adres bewerkt",

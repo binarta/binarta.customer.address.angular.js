@@ -1,13 +1,6 @@
 {
   "msgs":{
-    "default":{
-      "customer.address.addressee.label": "Full name",
-      "customer.address.street.label": "Street",
-      "customer.address.number.label": "Number",
-      "customer.address.city.label": "City",
-      "customer.address.zip.label": "Postal code",
-      "customer.address.country.label": "Country"
-    }, "nl":{
+    "nl":{
       "customer.address.addressee.label": "Geadresseerde",
       "customer.address.street.label": "Straat",
       "customer.address.number.label": "Huisnummer",
