@@ -3,8 +3,7 @@
   "main": [
     "./src/main/js/customer.address.js",
     "./src/main/js/customer.address-tpls-bootstrap3.js",
-    "./metadata-system.json",
-    "./metadata-app.json"
+    "./metadata-system.json"
   ],
   "dependencies": {
     "angular": "1.3.*",
