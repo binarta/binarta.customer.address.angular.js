@@ -620,4 +620,39 @@ describe('customer address', function() {
             expect(rest.calls[0].args[0]).toEqual(presenter);
         })
     });
+
+    describe('toCountryName filter', function () {
+        var config, filter;
+
+        beforeEach(inject(function (_config_, toCountryNameFilter) {
+            config = _config_;
+            filter = toCountryNameFilter;
+        }));
+
+        describe('with countries', function () {
+            beforeEach(function () {
+                config.countries = [
+                    {code:'BE', country:'Belgium'},
+                    {code:'GB', country: 'United Kingdom'},
+                    {code:'FR', country: 'France'}
+                ];
+            });
+
+            it('should convert to country name', function () {
+                expect(filter('BE')).toEqual('Belgium');
+            });
+
+            it('when unknown', function () {
+                expect(filter('unknown')).toEqual('');
+            });
+
+            it('with empty input', function () {
+                expect(filter('')).toEqual('');
+            });
+        });
+
+        it('no countries in config', function () {
+            expect(filter('BE')).toEqual('');
+        });
+    });
 });

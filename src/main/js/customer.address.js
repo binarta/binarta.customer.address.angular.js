@@ -2,7 +2,15 @@ angular.module('customer.address', ['angular.usecase.adapter', 'rest.client', 'c
     .controller('CustomerAddressController', ['$scope', 'usecaseAdapterFactory', 'restServiceHandler', 'config', 'topicMessageDispatcher', '$location', 'removeAddress', CustomerAddressController])
     .controller('EditCustomerAddressController', ['$scope', 'usecaseAdapterFactory', '$routeParams', 'restServiceHandler', 'config', 'topicMessageDispatcher', '$location', 'viewCustomerAddress', EditCustomerAddressController])
     .factory('removeAddress', ['usecaseAdapterFactory', 'restServiceHandler', 'config', RemoveAddressFactory])
-    .factory('viewCustomerAddress', ['usecaseAdapterFactory', 'config', 'restServiceHandler', ViewCustomerAddressFactory]);
+    .factory('viewCustomerAddress', ['usecaseAdapterFactory', 'config', 'restServiceHandler', ViewCustomerAddressFactory])
+    .filter('toCountryName', ['config', function (config) {
+        return function (val) {
+            if (!val) return '';
+            return (config.countries || []).reduce(function (p, c) {
+                return c.code == val ? c.country : p;
+            }, '');
+        }
+    }]);
 
 function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHandler, config, topicMessageDispatcher, $location, removeAddress) {
     $scope.countries = config.countries;
