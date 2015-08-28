@@ -31,6 +31,10 @@ function CustomerAddressController($scope, usecaseAdapterFactory, restServiceHan
     };
 
     $scope.submit = function (args) {
+        if ($scope.address && args && args.generateLabel) {
+            $scope.address.label = '(' + $scope.address.zip + ') ' + $scope.address.street + ' ' + $scope.address.number;
+        }
+
         var onSuccess = function () {
             topicMessageDispatcher.fire('system.success', {code: 'customer.address.add.success', default: 'Address was successfully added'});
             if (!(args && args.noRedirect)) $location.search().redirectTo ? $location.url(pathToRedirectTo()) : $location.path(pathToProfile());
@@ -96,6 +100,10 @@ function EditCustomerAddressController($scope, usecaseAdapterFactory, $routePara
     };
 
     $scope.submit = function (args) {
+        if (args && args.generateLabel) {
+            $scope.address.label = '(' + $scope.address.zip + ') ' + $scope.address.street + ' ' + $scope.address.number;
+        }
+
         var onSuccess = function () {
             topicMessageDispatcher.fire('system.success', {code: 'customer.address.edit.success', default: 'Address was successfully edited'});
             if (!(args && args.noRedirect)) $location.search().redirectTo ? $location.url(pathToRedirectTo()) : $location.path(pathToProfile());

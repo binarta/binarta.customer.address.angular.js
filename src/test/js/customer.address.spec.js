@@ -93,152 +93,170 @@ describe('customer address', function() {
         });
 
         describe('on submit', function() {
-            beforeEach(function() {
-                scope.addressee = 'addressee';
-                scope.label = 'label';
-                scope.street = 'street-name';
-                scope.number = '1';
-                scope.zip = '1234';
-                scope.city = 'city-name';
-                scope.country = 'country-name';
-                scope.submit();
-            });
+            describe('with attributes directly on scope', function() {
+                beforeEach(function() {
+                    scope.addressee = 'addressee';
+                    scope.label = 'label';
+                    scope.street = 'street-name';
+                    scope.number = '1';
+                    scope.zip = '1234';
+                    scope.city = 'city-name';
+                    scope.country = 'country-name';
+                    scope.submit();
+                });
 
-            it('usecase adapter receives scope', function() {
-                expect(usecaseAdapter.calls[0].args[0]).toEqual(scope);
-            });
+                it('usecase adapter receives scope', function() {
+                    expect(usecaseAdapter.calls[0].args[0]).toEqual(scope);
+                });
 
-            it('presenter params get populated', function() {
-                expect(presenter.params).toEqual({method: 'PUT', withCredentials: true, url: 'api/entity/customer-address',
-                    data: {
-                        addressee: scope.addressee,
-                        label: scope.label,
-                        street: scope.street,
-                        number: scope.number,
-                        zip: scope.zip,
-                        city: scope.city,
-                        country: scope.country
-                    }})
-            });
+                it('presenter params get populated', function() {
+                    expect(presenter.params).toEqual({method: 'PUT', withCredentials: true, url: 'api/entity/customer-address',
+                        data: {
+                            addressee: scope.addressee,
+                            label: scope.label,
+                            street: scope.street,
+                            number: scope.number,
+                            zip: scope.zip,
+                            city: scope.city,
+                            country: scope.country
+                        }})
+                });
 
-            ['addressee', 'label', 'street', 'number', 'city', 'country'].forEach(function(item) {
-                it("when " + item + " is null then it's passed as empty string", function() {
-                    scope[item] = null;
+                ['addressee', 'label', 'street', 'number', 'city', 'country'].forEach(function(item) {
+                    it("when " + item + " is null then it's passed as empty string", function() {
+                        scope[item] = null;
+                        scope.submit();
+
+                        expect(presenter.params.data[item]).toEqual('');
+                    });
+                });
+
+                it('rest service receives presenter', function() {
+                    expect(rest.calls[0].args[0]).toEqual(presenter);
+                });
+
+                describe('on success put payload on scope ', function() {
+                    describe('when locale is known', function() {
+                        beforeEach(function () {
+                            scope.locale = 'locale';
+                            usecaseAdapter.calls[0].args[1]();
+                        });
+
+                        it('dispatcher fires success message', function () {
+                            expect(dispatcherMock['system.success']).toEqual({code:'customer.address.add.success', default:'Address was successfully added'});
+                        });
+
+                        it('and redirectTo is set redirect to profile', function () {
+                            usecaseAdapter.calls[0].args[1]();
+
+                            expect(location.path()).toEqual('/locale/profile');
+                        });
+                    });
+
+                    it('when locale is undefined', function() {
+                        scope.locale = undefined;
+                        usecaseAdapter.calls[0].args[1]();
+
+                        expect(location.path()).toEqual('/profile');
+                    });
+
+                    it('when redirectTo is set in query string and locale is known', function () {
+                        scope.locale = 'locale';
+                        location.search().redirectTo = '/current/path';
+                        usecaseAdapter.calls[0].args[1]();
+
+                        expect(location.path()).toEqual('/locale/current/path');
+                    });
+
+                    it('when redirectTo is set in query string and locale is unknown', function () {
+                        scope.locale = undefined;
+                        location.search().redirectTo = '/current/path';
+                        usecaseAdapter.calls[0].args[1]();
+
+                        expect(location.path()).toEqual('/current/path');
+                    });
+
+                    it('when redirectTo is not set redirect to profile', function () {
+                        usecaseAdapter.calls[0].args[1]();
+
+                        expect(location.path()).toEqual('/profile');
+                    });
+
+                    it('when type is not set in query string', function () {
+                        location.search().redirectTo = '/path';
+                        scope.label = 'label';
+
+                        usecaseAdapter.calls[0].args[1]();
+
+                        expect(location.search().type).toBeUndefined();
+                    });
+                });
+
+                describe('with noRedirect arg and on success', function() {
+                    beforeEach(function () {
+                        usecaseAdapter.reset();
+                        location.path('/');
+                        scope.submit({noRedirect: true});
+                        usecaseAdapter.calls[0].args[1]();
+                    });
+
+                    it('do not redirect', function () {
+                        expect(location.path()).toEqual('/');
+                    });
+                });
+
+                it('with base-uri', function() {
+                    configMock.baseUri = 'base-uri/';
                     scope.submit();
 
-                    expect(presenter.params.data[item]).toEqual('');
+                    expect(presenter.params.url).toEqual('base-uri/api/entity/customer-address');
                 });
             });
 
-            it('rest service receives presenter', function() {
-                expect(rest.calls[0].args[0]).toEqual(presenter);
-            });
-
-            describe('on success put payload on scope ', function() {
-                describe('when locale is known', function() {
-                    beforeEach(function () {
-                        scope.locale = 'locale';
-                        usecaseAdapter.calls[0].args[1]();
-                    });
-
-                    it('dispatcher fires success message', function () {
-                        expect(dispatcherMock['system.success']).toEqual({code:'customer.address.add.success', default:'Address was successfully added'});
-                    });
-
-                    it('and redirectTo is set redirect to profile', function () {
-                        usecaseAdapter.calls[0].args[1]();
-
-                        expect(location.path()).toEqual('/locale/profile');
-                    });
+            describe('with address object', function() {
+                beforeEach(function() {
+                    scope.address = {
+                        addressee: 'addressee',
+                        label: 'label',
+                        street: 'street-name',
+                        number: '1',
+                        zip: '1234',
+                        city: 'city-name',
+                        country: 'country-name'
+                    };
                 });
 
-                it('when locale is undefined', function() {
-                    scope.locale = undefined;
-                    usecaseAdapter.calls[0].args[1]();
+                it('presenter params get populated', function() {
+                    scope.submit();
 
-                    expect(location.path()).toEqual('/profile');
+                    expect(presenter.params).toEqual({method: 'PUT', withCredentials: true, url: 'api/entity/customer-address',
+                        data: {
+                            addressee: scope.address.addressee,
+                            label: scope.address.label,
+                            street: scope.address.street,
+                            number: scope.address.number,
+                            zip: scope.address.zip,
+                            city: scope.address.city,
+                            country: scope.address.country
+                        }});
                 });
 
-                it('when redirectTo is set in query string and locale is known', function () {
-                    scope.locale = 'locale';
-                    location.search().redirectTo = '/current/path';
-                    usecaseAdapter.calls[0].args[1]();
+                it('when generating a default label', function () {
+                    scope.submit({generateLabel: true});
 
-                    expect(location.path()).toEqual('/locale/current/path');
-                });
-
-                it('when redirectTo is set in query string and locale is unknown', function () {
-                    scope.locale = undefined;
-                    location.search().redirectTo = '/current/path';
-                    usecaseAdapter.calls[0].args[1]();
-
-                    expect(location.path()).toEqual('/current/path');
-                });
-
-                it('when redirectTo is not set redirect to profile', function () {
-                    usecaseAdapter.calls[0].args[1]();
-
-                    expect(location.path()).toEqual('/profile');
-                });
-
-                it('when type is not set in query string', function () {
-                    location.search().redirectTo = '/path';
-                    scope.label = 'label';
-
-                    usecaseAdapter.calls[0].args[1]();
-
-                    expect(location.search().type).toBeUndefined();
+                    expect(presenter.params).toEqual({method: 'PUT', withCredentials: true, url: 'api/entity/customer-address',
+                        data: {
+                            addressee: scope.address.addressee,
+                            label: '(' + scope.address.zip + ') ' + scope.address.street + ' ' + scope.address.number,
+                            street: scope.address.street,
+                            number: scope.address.number,
+                            zip: scope.address.zip,
+                            city: scope.address.city,
+                            country: scope.address.country
+                        }});
                 });
             });
 
-            describe('with noRedirect arg and on success', function() {
-                beforeEach(function () {
-                    usecaseAdapter.reset();
-                    location.path('/');
-                    scope.submit({noRedirect: true});
-                    usecaseAdapter.calls[0].args[1]();
-                });
-
-                it('do not redirect', function () {
-                    expect(location.path()).toEqual('/');
-                });
-            });
-
-            it('with base-uri', function() {
-                configMock.baseUri = 'base-uri/';
-                scope.submit();
-
-                expect(presenter.params.url).toEqual('base-uri/api/entity/customer-address');
-            });
-
-        });
-
-        describe('on submit with address object', function() {
-            beforeEach(function() {
-                scope.address = {
-                    addressee: 'addressee',
-                    label: 'label',
-                    street: 'street-name',
-                    number: '1',
-                    zip: '1234',
-                    city: 'city-name',
-                    country: 'country-name'
-                };
-                scope.submit();
-            });
-
-            it('presenter params get populated', function() {
-                expect(presenter.params).toEqual({method: 'PUT', withCredentials: true, url: 'api/entity/customer-address',
-                    data: {
-                        addressee: scope.address.addressee,
-                        label: scope.address.label,
-                        street: scope.address.street,
-                        number: scope.address.number,
-                        zip: scope.address.zip,
-                        city: scope.address.city,
-                        country: scope.address.country
-                    }});
-            });
         });
 
         describe('on cancel', function () {
@@ -291,7 +309,7 @@ describe('customer address', function() {
     });
 
     describe('viewCustomerAddress', function() {
-        var success = function() {}
+        var success = function() {};
 
         beforeEach(inject(function(viewCustomerAddress) {
             service = viewCustomerAddress;
@@ -426,6 +444,22 @@ describe('customer address', function() {
                     },
                     url: 'baseUri/api/entity/customer-address',
                     withCredentials:true});
+            });
+
+            it('when generating a default label', function () {
+                scope.submit({generateLabel: true});
+
+                expect(presenter.params.data).toEqual({
+                        id: {label: scope.label},
+                        addressee: scope.address.addressee,
+                        label: '(' + scope.address.zip + ') ' + scope.address.street + ' ' + scope.address.number,
+                        street: scope.address.street,
+                        number: scope.address.number,
+                        zip: scope.address.zip,
+                        city: scope.address.city,
+                        country: scope.address.country,
+                        context: 'update'
+                    });
             });
 
             it('on success put payload on scope', function() {
