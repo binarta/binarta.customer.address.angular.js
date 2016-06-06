@@ -1,0 +1,6 @@
+{
+  "shop": {
+    "customer.address": "bower_components/binarta.customer.address/src/main/js/customer.address.js",
+    "customer.address.templates": "bower_components/binarta.customer.address/src/main/js/customer.address-tpls-bootstrap3.js"
+  }
+}

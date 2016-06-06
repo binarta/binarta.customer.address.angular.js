@@ -18,7 +18,7 @@ describe('customer address', function() {
     beforeEach(inject(function($rootScope, $location, usecaseAdapterFactory, restServiceHandler, topicMessageDispatcher, topicMessageDispatcherMock, config) {
         scope = $rootScope.$new();
         usecaseAdapter = usecaseAdapterFactory;
-        usecaseAdapter.andReturn(presenter);
+        usecaseAdapter.and.returnValue(presenter);
         rest = restServiceHandler;
         dispatcher = topicMessageDispatcher;
         dispatcherMock = topicMessageDispatcherMock;
@@ -39,16 +39,16 @@ describe('customer address', function() {
             });
 
             it('passes the scope to usecase adapter factory', function() {
-                expect(usecaseAdapter.calls[0].args[0]).toEqual(scope);
+                expect(usecaseAdapter.calls.first().args[0]).toEqual(scope);
             });
 
             it('calls the rest service with the presenter', function() {
-                expect(rest.calls[0].args[0]).toEqual(presenter);
+                expect(rest.calls.first().args[0]).toEqual(presenter);
             });
 
             it('puts fetched addresses on the scope', function() {
-                var addresses = [{property: 'prop1'}, {property: 'prop2'}]
-                usecaseAdapter.calls[0].args[1](addresses);
+                var addresses = [{property: 'prop1'}, {property: 'prop2'}];
+                usecaseAdapter.calls.first().args[1](addresses);
 
                 expect(scope.addresses).toEqual(addresses);
             });
@@ -83,11 +83,11 @@ describe('customer address', function() {
             });
 
             it('calls remove address with label', function() {
-                expect(removeAddress.calls[0].args[0]).toEqual({label: 'label'});
+                expect(removeAddress.calls.first().args[0]).toEqual({label: 'label'});
             });
 
             it('presenter sends notification', function() {
-                removeAddress.calls[1].args[1]();
+                removeAddress.calls.mostRecent().args[1]();
                 expect(dispatcherMock['system.success']).toEqual({code:'customer.address.delete.success', default:'Address was successfully removed'})
             })
         });
@@ -106,7 +106,7 @@ describe('customer address', function() {
                 });
 
                 it('usecase adapter receives scope', function() {
-                    expect(usecaseAdapter.calls[0].args[0]).toEqual(scope);
+                    expect(usecaseAdapter.calls.first().args[0]).toEqual(scope);
                 });
 
                 it('presenter params get populated', function() {
@@ -132,14 +132,14 @@ describe('customer address', function() {
                 });
 
                 it('rest service receives presenter', function() {
-                    expect(rest.calls[0].args[0]).toEqual(presenter);
+                    expect(rest.calls.first().args[0]).toEqual(presenter);
                 });
 
                 describe('on success put payload on scope ', function() {
                     describe('when locale is known', function() {
                         beforeEach(function () {
                             scope.locale = 'locale';
-                            usecaseAdapter.calls[0].args[1]();
+                            usecaseAdapter.calls.first().args[1]();
                         });
 
                         it('dispatcher fires success message', function () {
@@ -147,7 +147,7 @@ describe('customer address', function() {
                         });
 
                         it('and redirectTo is set redirect to profile', function () {
-                            usecaseAdapter.calls[0].args[1]();
+                            usecaseAdapter.calls.first().args[1]();
 
                             expect(location.path()).toEqual('/locale/profile');
                         });
@@ -155,7 +155,7 @@ describe('customer address', function() {
 
                     it('when locale is undefined', function() {
                         scope.locale = undefined;
-                        usecaseAdapter.calls[0].args[1]();
+                        usecaseAdapter.calls.first().args[1]();
 
                         expect(location.path()).toEqual('/profile');
                     });
@@ -163,7 +163,7 @@ describe('customer address', function() {
                     it('when redirectTo is set in query string and locale is known', function () {
                         scope.locale = 'locale';
                         location.search().redirectTo = '/current/path';
-                        usecaseAdapter.calls[0].args[1]();
+                        usecaseAdapter.calls.first().args[1]();
 
                         expect(location.path()).toEqual('/locale/current/path');
                     });
@@ -171,13 +171,13 @@ describe('customer address', function() {
                     it('when redirectTo is set in query string and locale is unknown', function () {
                         scope.locale = undefined;
                         location.search().redirectTo = '/current/path';
-                        usecaseAdapter.calls[0].args[1]();
+                        usecaseAdapter.calls.first().args[1]();
 
                         expect(location.path()).toEqual('/current/path');
                     });
 
                     it('when redirectTo is not set redirect to profile', function () {
-                        usecaseAdapter.calls[0].args[1]();
+                        usecaseAdapter.calls.first().args[1]();
 
                         expect(location.path()).toEqual('/profile');
                     });
@@ -186,7 +186,7 @@ describe('customer address', function() {
                         location.search().redirectTo = '/path';
                         scope.label = 'label';
 
-                        usecaseAdapter.calls[0].args[1]();
+                        usecaseAdapter.calls.first().args[1]();
 
                         expect(location.search().type).toBeUndefined();
                     });
@@ -194,10 +194,10 @@ describe('customer address', function() {
 
                 describe('with noRedirect arg and on success', function() {
                     beforeEach(function () {
-                        usecaseAdapter.reset();
+                        usecaseAdapter.calls.reset();
                         location.path('/');
                         scope.submit({noRedirect: true});
-                        usecaseAdapter.calls[0].args[1]();
+                        usecaseAdapter.calls.first().args[1]();
                     });
 
                     it('do not redirect', function () {
@@ -318,11 +318,11 @@ describe('customer address', function() {
         }));
 
         it('passes the scope to usecase adapter factory', function() {
-            expect(usecaseAdapter.mostRecentCall.args[0]).toEqual(scope);
+            expect(usecaseAdapter.calls.mostRecent().args[0]).toEqual(scope);
         });
 
         it('test', function() {
-            expect(usecaseAdapter.mostRecentCall.args[1]).toEqual(success);
+            expect(usecaseAdapter.calls.mostRecent().args[1]).toEqual(success);
         });
 
         it('url is not prefixed', function () {
@@ -340,7 +340,7 @@ describe('customer address', function() {
         });
 
         it('calls the rest service with the presenter', function() {
-            expect(rest.calls[0].args[0]).toEqual(presenter);
+            expect(rest.calls.first().args[0]).toEqual(presenter);
         });
     });
 
@@ -370,12 +370,12 @@ describe('customer address', function() {
             });
 
             it('passes scope to view customer address', function() {
-                expect(viewCustomerAddress.mostRecentCall.args[0]).toEqual(scope);
+                expect(viewCustomerAddress.calls.mostRecent().args[0]).toEqual(scope);
             });
 
             describe('when executing success callback', function() {
                 beforeEach(inject(function() {
-                    viewCustomerAddress.mostRecentCall.args[1](address);
+                    viewCustomerAddress.calls.mostRecent().args[1](address);
                 }));
 
                 it('payload gets put on scope as address', function() {
@@ -402,11 +402,11 @@ describe('customer address', function() {
             });
 
             it('passes the scope to usecase adapter factory', function() {
-                expect(usecaseAdapter.calls[0].args[0]).toEqual(scope);
+                expect(usecaseAdapter.calls.first().args[0]).toEqual(scope);
             });
 
             it('calls the rest service with the presenter', function() {
-                expect(rest.calls[0].args[0]).toEqual(presenter);
+                expect(rest.calls.first().args[0]).toEqual(presenter);
             });
 
             it('url is not prefixed', function () {
@@ -464,7 +464,7 @@ describe('customer address', function() {
 
             it('on success put payload on scope', function() {
                 scope.locale = 'locale';
-                usecaseAdapter.calls[0].args[1]();
+                usecaseAdapter.calls.first().args[1]();
                 expect(dispatcherMock['system.success']).toEqual({code:'customer.address.edit.success', default:'Address was successfully edited'});
                 expect(location.path()).toEqual('/locale/profile');
             });
@@ -476,20 +476,20 @@ describe('customer address', function() {
                     });
 
                     it('dispatcher fires success message', function () {
-                        usecaseAdapter.calls[0].args[1]();
+                        usecaseAdapter.calls.first().args[1]();
 
                         expect(dispatcherMock['system.success']).toEqual({code:'customer.address.edit.success', default:'Address was successfully edited'});
                     });
 
                     it('and redirectTo is set in query string', function () {
                         location.search().redirectTo = '/path';
-                        usecaseAdapter.calls[0].args[1]();
+                        usecaseAdapter.calls.first().args[1]();
 
                         expect(location.path()).toEqual('/locale/path');
                     });
 
                     it('and redirectTo is not set in query string', function () {
-                        usecaseAdapter.calls[0].args[1]();
+                        usecaseAdapter.calls.first().args[1]();
 
                         expect(location.path()).toEqual('/locale/profile');
                     });
@@ -502,13 +502,13 @@ describe('customer address', function() {
 
                     it('and redirectTo is set in query string', function () {
                         location.search().redirectTo = '/path';
-                        usecaseAdapter.calls[0].args[1]();
+                        usecaseAdapter.calls.first().args[1]();
 
                         expect(location.path()).toEqual('/path');
                     });
 
                     it('and redirectTo is not set in query string', function () {
-                        usecaseAdapter.calls[0].args[1]();
+                        usecaseAdapter.calls.first().args[1]();
 
                         expect(location.path()).toEqual('/profile');
                     });
@@ -517,10 +517,10 @@ describe('customer address', function() {
 
             describe('with noRedirect arg and on success', function() {
                 beforeEach(function () {
-                    usecaseAdapter.reset();
+                    usecaseAdapter.calls.reset();
                     location.path('/');
                     scope.submit({noRedirect: true});
-                    usecaseAdapter.calls[0].args[1]();
+                    usecaseAdapter.calls.first().args[1]();
                 });
 
                 it('do not redirect', function () {
@@ -590,7 +590,7 @@ describe('customer address', function() {
         });
 
         it('passes the scope to the usecase factory', function() {
-            expect(usecaseAdapter.calls[0].args[0]).toEqual(scope);
+            expect(usecaseAdapter.calls.first().args[0]).toEqual(scope);
         });
 
         it('sends DELETE request', function() {
@@ -617,7 +617,7 @@ describe('customer address', function() {
         });
 
         it('test', function() {
-            expect(rest.calls[0].args[0]).toEqual(presenter);
+            expect(rest.calls.first().args[0]).toEqual(presenter);
         })
     });
 
